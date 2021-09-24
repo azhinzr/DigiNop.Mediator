@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using ApiClient.ApiStandardResults;
+using ApiClient.ApiStandardResults.Exceptions;
 using ApiClient.NopCommerce.ApiStandardResults;
-using ApiClient.NopCommerce.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RestSharp;
 
 namespace ApiClient.NopCommerce
 {
-    public class NopApiClient  : INopAliClient
+    public class NopApiClient : INopAliClient
     {
         private static string _accessToken;
-         private readonly RestClient _client;
+        private readonly RestClient _client;
         private readonly IConfiguration _configuration;
         private int _tryCount;
         private int _tryCountforToken;
@@ -28,30 +28,22 @@ namespace ApiClient.NopCommerce
             _tryCountforToken = 0;
 
         }
-
-
         public Task<ApiResult<T>> Get<T>(string url, object payload = null, ICollection<KeyValuePair<string, string>> queryParams = null, bool returnOriginalResponse = false)
         {
             return Execute<T>(url, payload, Method.GET);
         }
-
         public Task<ApiResult<T>> Post<T>(string url, object payload, bool returnOriginalResponse = false, ICollection<KeyValuePair<string, string>> extraHeaders = null)
         {
             return Execute<T>(url, payload, Method.POST);
         }
-
         public Task<ApiResult<T>> Put<T>(string url, object payload, bool returnOriginalResponse = false, ICollection<KeyValuePair<string, string>> extraHeaders = null)
         {
             return Execute<T>(url, payload, Method.PUT);
         }
-
         public Task<ApiResult<T>> Delete<T>(string url, object payload = null, bool returnOriginalResponse = false)
         {
             throw new NotImplementedException();
         }
-
-
-
         private async Task<ApiResult<T>> Execute<T>(string url, object payload, Method method)
         {
             var headers = GetHeaders();
@@ -71,11 +63,10 @@ namespace ApiClient.NopCommerce
                     return await Execute<T>(url, payload, method);
                 }
             }
-            ThrowExceptionIfErrorOccured<T>(url, payload, response, headers);
+            ThrowExceptionIfErrorOccured(url, payload, response, headers);
 
             return response.Data;
         }
-
         private RestRequest CreateRequest(
             string url,
             object payload,
@@ -107,13 +98,12 @@ namespace ApiClient.NopCommerce
                     ClientSecret = _configuration[$"Nop:ClientSecret"],
                     ServerUrl = _configuration[$"Nop:BaseUrl"]
                 };
-                client.RemoteCertificateValidationCallback= (sender, cert, chain, sslPolicyErrors) => { return true; };
-                //_client.FollowRedirects = false;
+                client.RemoteCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
                 request.AddJsonBody(payload);
                 var response = client.Execute<ApiResult<TokenModel>>(request);
-                
+
                 if (response.StatusCode != HttpStatusCode.OK)
-                { 
+                {
                     if (_tryCountforToken < 3)
                     {
                         _tryCount++;
@@ -141,14 +131,13 @@ namespace ApiClient.NopCommerce
             var headers = new Dictionary<string, string> { { "authorization", $"Bearer {_accessToken}" } };
             return headers;
         }
-
         private void ThrowExceptionIfErrorOccured<T>(string url, object payload, IRestResponse<ApiResult<T>> response, Dictionary<string, string> headers)
         {
             if (response.IsSuccessful == false)
             {
-                throw new NopApiCallException.Builder()
+                throw new ApiCallException.Builder()
                     .WithApiUrlAddress(url)
-                       
+
                     .WithInputData(response.Content)
 
                     .WithInnerException(response.ErrorException)
@@ -156,20 +145,6 @@ namespace ApiClient.NopCommerce
             }
         }
 
-        //private void ThrowExceptionIfErrorOccured<T>(string url, object payload, IRestResponse<ApiResult<T>> response, Dictionary<string, string> headers)
-        //{
-        //    if (response.IsSuccessful == false)
-        //    {
-        //        throw new NopApiCallException.Builder()
-        //            .WithApiUrlAddress(url) 
-        //            .WithInputData(response.Content)
-                 
-        //            .WithInnerException(response.ErrorException)
-        //            .Build();
-        //    }
-        //}
-
-      
     }
 
 

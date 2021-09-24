@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ApiClient.ApiStandardResults;
+using ApiClient.ApiStandardResults.Exceptions;
+using Microsoft.Extensions.Configuration;
+using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using ApiClient.ApiStandardResults;
-using ApiClient.NopCommerce.ApiStandardResults;
-using Microsoft.Extensions.Configuration;
-using RestSharp;
 
 namespace ApiClient.Digikala
 {
@@ -105,6 +105,19 @@ namespace ApiClient.Digikala
         {
             return _configuration["Digikala:AccesToken"];
 
+        }
+        private void ThrowExceptionIfErrorOccured<T>(string url, object payload, IRestResponse<ApiResult<T>> response, Dictionary<string, string> headers)
+        {
+            if (response.IsSuccessful == false)
+            {
+                throw new ApiCallException.Builder()
+                    .WithApiUrlAddress(url)
+
+                    .WithInputData(response.Content)
+
+                    .WithInnerException(response.ErrorException)
+                    .Build();
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
  namespace ApiClient.ApiStandardResults
 
 {
-    public class ApiResult<TResult> : NopApiResult
+    public class ApiResult<TResult> 
     {
       
         public bool Succeeded { get; set; } 

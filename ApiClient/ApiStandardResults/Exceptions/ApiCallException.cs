@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace ApiClient.NopCommerce.Exceptions
+namespace ApiClient.ApiStandardResults.Exceptions
 {
-    public class NopApiCallException : Exception
+    public class ApiCallException : Exception
     {
-        public NopApiCallException(string message, Exception innerException = null)
+        public ApiCallException(string message, Exception innerException = null)
         : base(message, innerException)
         {
 
@@ -51,10 +51,10 @@ namespace ApiClient.NopCommerce.Exceptions
                 return this;
             }
 
-            public NopApiCallException Build()
+            public ApiCallException Build()
             {
                 var message = GenerateExceptionMessage();
-                var crmApiCallException = new NopApiCallException(message, _innerException);
+                var crmApiCallException = new ApiCallException(message, _innerException);
                 return crmApiCallException;
             }
 

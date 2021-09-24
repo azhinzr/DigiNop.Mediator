@@ -22,16 +22,10 @@ namespace Mediator.ACL.Digikala
         {
             _configuration = configuration;
             _apiClient = apiClient;
-        }
-
-        public Task<DigikalaProducts> GetProducts(int pageNo)
-        {
-            throw new System.NotImplementedException();
-        }
+        } 
 
         public async Task<Item> GetProductbyId(string Id)
-        {
-
+        { 
             var response = await _apiClient.Get<Data>(string.Format($"{_configuration["Digikala:GetProductUrl"]}", Id));
             return response.Data.items.FirstOrDefault();
         }
@@ -49,9 +43,6 @@ namespace Mediator.ACL.Digikala
             //        $"-{response.data.package_height}" +
             //        $"-{response.data.seller_physical_stock}" : "");
             //}
-        }
-
-       
-    }
-
+        } 
+    } 
 }

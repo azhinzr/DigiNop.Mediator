@@ -7,8 +7,7 @@ namespace Mediator.ACL.Digikala.services
 {
     public interface IDigikalaService
     {
-        Task<DigikalaProducts> GetProducts(int pageNo);
-        Task<Item> GetProductbyId(string id);
+         Task<Item> GetProductbyId(string id);
         Task UpdateVariant(UpdateProductDto productDto, int id);
     }
 

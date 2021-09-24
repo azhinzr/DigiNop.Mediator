@@ -23,9 +23,7 @@ namespace Mediator.Jobs
 
         public void Execute()
         {
-            Console.WriteLine($" ProductSynchronizer for digikala started");
-
-
+            Console.WriteLine($" ProductSynchronizer for digikala started"); 
 
              var total = _nopService.GetProductsCount().GetAwaiter().GetResult();
 
@@ -43,9 +41,7 @@ namespace Mediator.Jobs
                     Console.WriteLine($"page {pageNo} started");
                     var products = _nopService.GetProducts(pageNo).GetAwaiter().GetResult();
                     foreach (var item in products)
-                    {
-
-
+                    {  
                         if (!item.published)
                         {
                             Console.WriteLine(" id:" + item.id + "is not published ");

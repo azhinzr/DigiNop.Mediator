@@ -54,8 +54,8 @@ namespace ApiClient.ApiStandardResults.Exceptions
             public ApiCallException Build()
             {
                 var message = GenerateExceptionMessage();
-                var crmApiCallException = new ApiCallException(message, _innerException);
-                return crmApiCallException;
+                var ApiCallException = new ApiCallException(message, _innerException);
+                return ApiCallException;
             }
 
             private string GenerateExceptionMessage()

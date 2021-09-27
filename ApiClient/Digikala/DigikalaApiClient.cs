@@ -20,7 +20,7 @@ namespace ApiClient.Digikala
         {
             _configuration = configuration;
             var timeout = Convert.ToInt32(_configuration.GetSection("Digikala:TimeoutInMilliseconds").Value);
-            _client = new RestClient { Timeout = timeout};
+            _client = new RestClient { Timeout = timeout };
             _tryCount = 0;
             _client.BaseUrl = new Uri(_configuration["Digikala:BaseUrl"]);
         }
@@ -47,37 +47,34 @@ namespace ApiClient.Digikala
 
         private async Task<ApiResult<T>> Execute<T>(string url, object payload, Method method)
         {
-            var request = CreateRequest(url, payload, method, null);
-            
-            var response =await _client.ExecuteAsync<ApiResult<T>>(request);
-            if (response.Data == null)
-            {
-                System.Threading.Thread.Sleep(40000);
-                return await Execute<T>(url, payload, method);
-            }
+            var headers = GetHeaders();
+
+            var request = CreateRequest(url, payload, method,headers, null);
+
+            var response = await _client.ExecuteAsync<ApiResult<T>>(request);
+
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 if (_tryCount < 3)
                 {
-                    System.Threading.Thread.Sleep(4000); 
+                    System.Threading.Thread.Sleep(4000);
                     _tryCount++;
                     return await Execute<T>(url, payload, method);
                 }
-                
+
             }
-           
-             return response.Data;
+            ThrowExceptionIfErrorOccured(url, payload, response, headers);
+            return response.Data;
         }
-      
+
 
         private RestRequest CreateRequest(
             string url,
             object payload,
             Method method,
-             ICollection<KeyValuePair<string, string>> queryParams
-        )
+            Dictionary<string, string> headers,
+            ICollection<KeyValuePair<string, string>> queryParams)
         {
-            var headers = GetHeaders();
             var request = new RestRequest(url, method, DataFormat.Json);
             if (payload != null)
             {
